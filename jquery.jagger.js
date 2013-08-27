@@ -11,7 +11,8 @@
 
     // jagger defaults
     var defaults = {
-        template: "#jagger-template"        
+        template: "#jagger-template",
+        pinElement: "<span class='pin'></span>"
     };
     
     /* ==============================================
@@ -19,11 +20,19 @@
        ============================================== */
 
     function Jagger( element, options ) {
+        // Set the default options
         this.options = $.extend({}, defaults, options);
 
-        this.options.$pinElement = this._getjQueryInstanceFrom(this.options.pinElement);
+        // Set the inner jquery instance for the pin
+        this.$pinElement = this._getjQueryInstanceFrom(this.options.pinElement);
 
+        // Find and store the template
+        this.$template = this._getjQueryTemplateContainer(this.options.template);
+
+        // Container jquery element
         this.$el = $(element);
+
+        this.setOnClickHandler();
 
         return this;
     };
@@ -32,6 +41,57 @@
         _getjQueryInstanceFrom: function(elem) {
             elem = elem || "<div>";
             return (typeof elem !== "string" && "jquery" in elem) ? elem : $(elem);
+        },
+        _getjQueryTemplateContainer: function(templateSelector) {
+            var templateContainer = document.createElement("div");
+            templateContainer.className = "jagger-template-container";
+            templateContainer.innerHTML = $(this.options.template).html();
+
+            return $(templateContainer);
+        },
+        setOnClickHandler: function(event) {
+            var self = this;
+
+            this.$el.on("click.jagger", function(event) {
+                // Clone the pin and the template so we can append them
+                var $pin      = self.$pinElement.clone();
+                var $template = self.$template.clone();
+
+                // Mouse position onclick
+                var mouseCoords = {
+                    x: event.clientX,
+                    y: event.clientY
+                };
+
+                var pinPosition = self.determinePinPosition(mouseCoords);
+
+                $pin.css(pinPosition).appendTo(this);
+
+                $template.css( self.determineTemplatePosition(pinPosition) ).appendTo(this)
+            });
+            return this;
+        },
+        determinePinPosition: function(mouseCoords) {
+            var elCoords = this.getElOffset();
+            return {
+                position: "absolute",
+                top : mouseCoords.y - elCoords.y,
+                left: mouseCoords.x - elCoords.x
+            };
+        },
+        determineTemplatePosition: function(pinPosition) {
+            //Fixed for now
+            pinPosition.top  -= 10;
+            pinPosition.left += 30;
+            return pinPosition;
+        },
+        getElOffset: function() {
+            var $window  = $(window);
+            var elOffset = this.$el.offset();
+            return {
+                x: elOffset.left - $window.scrollLeft(),
+                y: elOffset.top  - $window.scrollTop()
+            };
         },
         remove: function() {
             this.$el.removeData(pluginDataName);

@@ -27,10 +27,48 @@ describe("jquery tagger", function() {
         expect(jagger.remove).toHaveBeenCalledWith("argument1", "argument2");
 	});
 
+	it("should set a click handler for the container element", function() {
+		expect(this.$el).toHandle("click.jagger"); 
+	});
+
+	describe("on click", function() {
+		beforeEach(function() {
+			var elementPosition = this.$el.position();
+			var event = {
+			    type: 'click',
+				clientX: elementPosition.left + 20,
+				clientY: elementPosition.top + 13
+			};
+		 	this.$el.trigger(event);
+		});
+
+		it("should append a pin element to the container", function() {
+		 	expect(this.$el).toContain("span.pin");
+		});
+
+		it("should append the pin using the mouse coords", function() {
+		 	var pinPosition = this.$el.children("span.pin").position();
+
+		 	expect(pinPosition.left).toBe(20);
+		 	expect(pinPosition.top ).toBe(13);
+		});
+
+		it("should append the template", function() {
+		 	expect(this.$el).toContain(".jagger-template-container"); 
+		 	expect( this.$el.find(".jagger-template-container") ).toContain(".in-custom-template"); 
+		});
+		it("should append the template using the mouse coords", function() {
+			var templatePosition = this.$el.children(".jagger-template-container").position();
+
+			// For now, the offset of the template is fixed in the code
+		 	expect(templatePosition.left).toBe(50);
+		 	expect(templatePosition.top ).toBe(3);
+		});
+	});
+
    	describe("the instance", function() {
 		it("should set the default values if the option is missing", function() {
 			jagger = this.callJaggerAndGetInstance();
-
 	   		expect( jagger.options.template ).toBe("#jagger-template");
 	   	});
 
@@ -48,7 +86,7 @@ describe("jquery tagger", function() {
 				jagger = this.callJaggerAndGetInstance({
 	   				pinElement: element
 				});
-				return jagger.options.$pinElement;
+				return jagger.$pinElement;
 	   		}
 			it("should support a string", function() {
 		   		expect( getPinElement.call(this, "<img class='pin' src='url/to/image.jpg'></img>") ).toBeMatchedBy("img.pin");
@@ -65,5 +103,4 @@ describe("jquery tagger", function() {
 		   	});
 	   	});
    	});
-
 });
