@@ -30,10 +30,8 @@
 
     Jagger.prototype = {
         _getjQueryInstanceFrom: function(elem) {
-            if(elem == null) {
-                return $("<div>");
-            }
-            return "jquery" in Object(elem) ? elem : $(elem);
+            elem = elem || "<div>";
+            return (typeof elem !== "string" && "jquery" in elem) ? elem : $(elem);
         },
         remove: function() {
             this.$el.removeData(pluginDataName);

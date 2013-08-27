@@ -7,7 +7,7 @@ describe("jquery tagger", function() {
 
 		spyOn(jQuery.fn, "jagger").andCallThrough();
 
-		jagger = this.callJaggerWithAndGetInstance({
+		jagger = this.callJaggerAndGetInstance({
    			template: "#my-template"
    		});
 	});
@@ -29,7 +29,7 @@ describe("jquery tagger", function() {
 
    	describe("the instance", function() {
 		it("should set the default values if the option is missing", function() {
-			jagger = this.callJaggerWithAndGetInstance();
+			jagger = this.callJaggerAndGetInstance();
 
 	   		expect( jagger.options.template ).toBe("#jagger-template");
 	   	});
@@ -44,13 +44,25 @@ describe("jquery tagger", function() {
 	   	});
 
 	   	describe("the stored pin element", function() {
-			it("should support a string", function() {
-				jagger = this.callJaggerWithAndGetInstance({
-	   				pinElement: "<img class='pin' src='url/to/image.jpg'></img>"
+	   		var getPinElement = function(element) {
+				jagger = this.callJaggerAndGetInstance({
+	   				pinElement: element
 				});
-		   		expect( jagger.options.$pinElement ).toHaveClass("pin");
+				return jagger.options.$pinElement;
+	   		}
+			it("should support a string", function() {
+		   		expect( getPinElement.call(this, "<img class='pin' src='url/to/image.jpg'></img>") ).toBeMatchedBy("img.pin");
 		   	});
+			it("should support a DOM element", function() {
+				var img = document.createElement("img");
+				img.className = "pin";
 
+		   		expect( getPinElement.call(this, img) ).toBeMatchedBy("img.pin");
+		   	});
+			it("should support a jQuery instance", function() {
+				var $img = $("<img>", { "class": "pin" });
+		   		expect( getPinElement.call(this, $img) ).toBeMatchedBy("img.pin");
+		   	});
 	   	});
    	});
 

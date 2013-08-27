@@ -17,7 +17,7 @@ beforeEach(function() {
 		return this.$el.jagger(options);
 	};
 
-	this.callJaggerWithAndGetInstance = function(options) {
+	this.callJaggerAndGetInstance = function(options) {
 		this.callJaggerWith(options);
 		return this.getInstance();
 	};
