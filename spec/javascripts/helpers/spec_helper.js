@@ -1,6 +1,13 @@
 beforeEach(function() {
 	var dataName = "jagger";
 
+	this.initializeTestSuite = function() {
+		loadFixtures("jagger_fixture.html");
+		this.setElement(".taggeable-container");
+
+		spyOn(jQuery.fn, "jagger").andCallThrough();
+	};
+
 	this.setElement = function(selector) {
 		this.$el = $(selector);
 	};
@@ -20,5 +27,9 @@ beforeEach(function() {
 	this.callJaggerAndGetInstance = function(options) {
 		this.callJaggerWith(options);
 		return this.getInstance();
+	};
+
+	this.getTemplateContainer = function() {
+		return this.$el.children(".jagger-template-container");
 	};
 });

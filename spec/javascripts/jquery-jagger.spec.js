@@ -2,10 +2,7 @@ describe("jquery tagger", function() {
 	var jagger;
 
 	beforeEach(function() {
-		loadFixtures("jagger_fixture.html");
-		this.setElement(".taggeable-container");
-
-		spyOn(jQuery.fn, "jagger").andCallThrough();
+		this.initializeTestSuite();
 
 		jagger = this.callJaggerAndGetInstance({
    			template: "#my-template"
@@ -58,11 +55,35 @@ describe("jquery tagger", function() {
 		 	expect( this.$el.find(".jagger-template-container") ).toContain(".in-custom-template"); 
 		});
 		it("should append the template using the mouse coords", function() {
-			var templatePosition = this.$el.children(".jagger-template-container").position();
+			var templatePosition = this.getTemplateContainer().position();
 
 			// For now, the offset of the template is fixed in the code
 		 	expect(templatePosition.left).toBe(50);
 		 	expect(templatePosition.top ).toBe(3);
+		});
+	});
+
+	describe("on a custom jagger:event", function() {
+		var $template;
+		beforeEach(function() {
+			this.$el.trigger("click");
+			$template = this.getTemplateContainer();
+		});
+		it("should hide the template on jagger:closeTemplate", function() {
+			spyOn(jQuery.fn, "hide");
+
+			$template.trigger("jagger:closeTemplate"); 
+			expect(jQuery.fn.hide).toHaveBeenCalled();
+		});
+		it("should show the template on jagger:showTemplate", function() {
+			spyOn(jQuery.fn, "show");
+
+			$template.trigger("jagger:showTemplate"); 
+			expect(jQuery.fn.show).toHaveBeenCalled();
+		});
+		it("should delete the template on jagger:deleteTemplate", function() {
+			$template.trigger("jagger:deleteTemplate"); 
+			expect($template.get(0).parentNode).toBeFalsy();
 		});
 	});
 

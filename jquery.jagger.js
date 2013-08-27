@@ -26,7 +26,8 @@
         // Container jquery element
         this.$el = $(element);
 
-        this.setOnClickHandler();
+        this._setOnClickHandler();
+
 
         return this;
     };
@@ -34,10 +35,11 @@
     Jagger.prototype = {
         getPin: function() {
             var pin = this.options.pinElement;
-            if(typeof pin === "function") {
+
+            if($.isFunction(pin)) {
                 pin = pin(this);
             }
-            pin = pin || "<div>";
+            pin = pin || defaults.pinElement;
 
             return (typeof pin !== "string" && "jquery" in pin) ? pin : $(pin);
         },
@@ -46,9 +48,9 @@
             templateContainer.className = "jagger-template-container";
             templateContainer.innerHTML = $(this.options.template).html();
 
-            return $(templateContainer);
+            return this._setTemplateHandlers( $(templateContainer) );
         },
-        setOnClickHandler: function(event) {
+        _setOnClickHandler: function(event) {
             var self = this;
 
             this.$el.on("click.jagger", function(event) {
@@ -91,6 +93,15 @@
                 y: elOffset.top  - $window.scrollTop()
             };
         },
+        _setTemplateHandlers: function($template) {
+            return $template.on("jagger:showTemplate", function() {
+                $(this).show();
+            }).on("jagger:closeTemplate", function() {
+                $(this).hide();
+            }).on("jagger:deleteTemplate", function() {
+                $(this).remove();
+            });
+        },
         remove: function() {
             this.$el.removeData(pluginDataName);
             return this.$el;
@@ -119,15 +130,11 @@
                     throw "The method: " + options + " was not found in jagger";
                 }
 
-                var returnValue = instance[options].apply(instance, methodArguments);
-
-                if (returnValue !== undefined) {
-                    return returnValue;
-                }
+                instance[options].apply(instance, methodArguments);
             } else {
                 // Create only one instance
                 if ( !$.data(this, pluginDataName) ) {
-                    $.data(this, pluginDataName, new Jagger( this, options ));
+                   $.data(this, pluginDataName, new Jagger( this, options ));
                 }
             }
         });
