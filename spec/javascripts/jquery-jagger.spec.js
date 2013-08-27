@@ -86,7 +86,7 @@ describe("jquery tagger", function() {
 				jagger = this.callJaggerAndGetInstance({
 	   				pinElement: element
 				});
-				return jagger.$pinElement;
+				return jagger.getPin();
 	   		}
 			it("should support a string", function() {
 		   		expect( getPinElement.call(this, "<img class='pin' src='url/to/image.jpg'></img>") ).toBeMatchedBy("img.pin");
@@ -100,6 +100,27 @@ describe("jquery tagger", function() {
 			it("should support a jQuery instance", function() {
 				var $img = $("<img>", { "class": "pin" });
 		   		expect( getPinElement.call(this, $img) ).toBeMatchedBy("img.pin");
+		   	});
+			it("should support a function that will get called on every click", function() {
+				var counter = 0;
+				var pinGenerator = jasmine.createSpy('pinGenerator');
+
+				pinGenerator.andCallFake(function(instance) {
+					counter += 1;
+					return '<span id="counter' + counter + '">' + counter + '</span>';
+				});
+
+				jagger = this.callJaggerAndGetInstance({
+	   				pinElement: pinGenerator
+				});
+
+		   		this.$el.trigger("click");
+		   		expect( $("#counter1") ).toHaveHtml(1);
+
+		   		this.$el.trigger("click");
+		   		expect( $("#counter2") ).toHaveHtml(2);
+
+		   		expect( pinGenerator ).toHaveBeenCalledWith( jagger );
 		   	});
 	   	});
    	});

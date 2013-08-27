@@ -23,12 +23,6 @@
         // Set the default options
         this.options = $.extend({}, defaults, options);
 
-        // Set the inner jquery instance for the pin
-        this.$pinElement = this._getjQueryInstanceFrom(this.options.pinElement);
-
-        // Find and store the template
-        this.$template = this._getjQueryTemplateContainer(this.options.template);
-
         // Container jquery element
         this.$el = $(element);
 
@@ -38,11 +32,16 @@
     };
 
     Jagger.prototype = {
-        _getjQueryInstanceFrom: function(elem) {
-            elem = elem || "<div>";
-            return (typeof elem !== "string" && "jquery" in elem) ? elem : $(elem);
+        getPin: function() {
+            var pin = this.options.pinElement;
+            if(typeof pin === "function") {
+                pin = pin(this);
+            }
+            pin = pin || "<div>";
+
+            return (typeof pin !== "string" && "jquery" in pin) ? pin : $(pin);
         },
-        _getjQueryTemplateContainer: function(templateSelector) {
+        getTemplate: function() {
             var templateContainer = document.createElement("div");
             templateContainer.className = "jagger-template-container";
             templateContainer.innerHTML = $(this.options.template).html();
@@ -53,9 +52,8 @@
             var self = this;
 
             this.$el.on("click.jagger", function(event) {
-                // Clone the pin and the template so we can append them
-                var $pin      = self.$pinElement.clone();
-                var $template = self.$template.clone();
+                var $pin      = self.getPin();
+                var $template = self.getTemplate();
 
                 // Mouse position onclick
                 var mouseCoords = {
