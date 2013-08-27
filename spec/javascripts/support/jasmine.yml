@@ -1,0 +1,10 @@
+src_files:
+    - lib/jquery.js
+    - jquery.jagger.js
+    - spec/javascripts/extensions/*.js
+
+helpers:
+  - 'helpers/**/*.js'
+
+spec_files:
+  - '**/**.spec.js'
