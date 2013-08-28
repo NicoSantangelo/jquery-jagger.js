@@ -40,11 +40,11 @@ describe("jquery tagger", function() {
 		});
 
 		it("should append a pin element to the container", function() {
-		 	expect(this.$el).toContain("span.pin");
+		 	expect(this.$el).toContain("span.jagger-pin");
 		});
 
 		it("should append the pin using the mouse coords", function() {
-		 	var pinPosition = this.$el.find("span.pin").position();
+		 	var pinPosition = this.$el.find("span.jagger-pin").position();
 
 		 	expect(pinPosition.left).toBe(20);
 		 	expect(pinPosition.top ).toBe(13);
@@ -61,6 +61,12 @@ describe("jquery tagger", function() {
 		 	expect(templatePosition.left).toBe(50);
 		 	expect(templatePosition.top ).toBe(3);
 		});
+		it("should store the pin coords on the containers data", function() {
+			var pinCoords = $(".jagger-pin-template-container").data("jagger:pinCoords");
+
+			expect(pinCoords.left).toBe(20);
+			expect(pinCoords.top ).toBe(13);
+		});
 	});
 
 	describe("on a custom jagger:event", function() {
@@ -69,7 +75,7 @@ describe("jquery tagger", function() {
 			this.$el.trigger("click");
 
 			$template = this.getTemplateContainer();
-			$pin = $(".pin");
+			$pin = $(".jagger-pin");
 		});
 		it("should show the template when the pin is clicked", function() {
 			$template.hide();
@@ -80,7 +86,7 @@ describe("jquery tagger", function() {
 		it("should delete the template and the pin on jagger:deleteTemplate", function() {
 			$template.trigger("jagger:deleteTemplate"); 
 			
-			expect( $(".jagger-template-container") ).not.toExist();
+			expect( $(".jagger-pin-template-container") ).not.toExist();
 		});
 	});
 

@@ -6,13 +6,23 @@
         throw "jQuery should be defined to use jagger";
     }
 
-    var pluginName = "jagger",
-        pluginDataName = pluginName;
+    var pluginName = "jagger";
+
+    var prefix = function(selector, before) {
+        return (before || "") + pluginName + "-" + selector;
+    };
+    prefix.id = function(selector) {
+        return prefix(selector, "#");
+    };
+    prefix.className = function(selector) {
+        return prefix(selector, ".");
+    };
+
 
     // jagger defaults
     var defaults = {
-        template: "#jagger-template",
-        pinElement: "<span class='pin'></span>"
+        template: prefix.id("template"),
+        pinElement: "<span class='" + prefix("pin") + "'></span>"
     };
     
     /* ==============================================
@@ -29,12 +39,12 @@
         this._setOnClickHandler();
 
         return this;
-    };
+    }
 
     Jagger.prototype = {
         getContainer: function() {
             var pinTemplateContainer = document.createElement("div");
-            pinTemplateContainer.className = "jagger-pin-template-container";
+            pinTemplateContainer.className = prefix("pin-template-container");
 
             return $(pinTemplateContainer);
         },
@@ -52,21 +62,18 @@
         },
         getTemplate: function() {
             var templateContainer = document.createElement("div");
-            templateContainer.className = "jagger-template-container";
+            templateContainer.className = prefix("template-container");
             templateContainer.innerHTML = $(this.options.template).html();
 
             return this._setTemplateHandlers( $(templateContainer) );
         },
-        _setOnClickHandler: function(event) {
+        _setOnClickHandler: function() {
             var self = this;
 
             this.$el.on("click.jagger", function(event) {
                 var $container = self.getContainer();
                 var $template  = self.getTemplate();
                 var $pin       = self.getPin();
-
-                // Add a reference
-                $pin.data("template", $template);
 
                 // Mouse position onclick
                 var mouseCoords = {
@@ -77,7 +84,12 @@
                 var pinPosition      = self.determinePinPosition(mouseCoords);
                 var templatePosition = self.determineTemplatePosition(pinPosition);
                 
-                $container.append($pin.css(pinPosition), $template.css(templatePosition)).appendTo(this);
+                $container.data("jagger:pinCoords", {
+                            top: pinPosition.top,
+                            left: pinPosition.left
+                        })
+                        .append($pin.css(pinPosition), $template.css(templatePosition))
+                        .appendTo(this);
             });
             return this;
         },
@@ -107,7 +119,7 @@
         },
         _setPinHandlers: function($pin) {
             return $pin.on("click.jagger", function() {
-                $pin.data("template").show();
+                $pin.siblings(prefix.className("template-container")).show();
                 return false;
             });
         },
@@ -117,7 +129,7 @@
             });
         },
         remove: function() {
-            this.$el.removeData(pluginDataName);
+            this.$el.removeData(pluginName);
             return this.$el;
         }
     };
@@ -136,9 +148,9 @@
             // When the first argument is a string, call a method on the instance with that string as the method name
             // Otherwise instantiate the plugin
             if (isMethod) {
-                var instance = $.data(this, pluginDataName);
+                var instance = $.data(this, pluginName);
                 if (!instance) {
-                    throw "Method called on jagger before instantiation";
+                    throw "Method called on jagger before instantiation ";
                 }
                 if ( !$.isFunction(instance[options]) ) {
                     throw "The method: " + options + " was not found in jagger";
@@ -147,8 +159,8 @@
                 instance[options].apply(instance, methodArguments);
             } else {
                 // Create only one instance
-                if ( !$.data(this, pluginDataName) ) {
-                   $.data(this, pluginDataName, new Jagger( this, options ));
+                if ( !$.data(this, pluginName) ) {
+                   $.data(this, pluginName, new Jagger( this, options ));
                 }
             }
         });
