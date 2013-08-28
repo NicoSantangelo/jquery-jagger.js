@@ -103,24 +103,18 @@ describe("jquery tagger", function() {
 	   	});
 
 	   	describe("the stored pin element", function() {
-	   		var getPinElement = function(element) {
-				jagger = this.callJaggerAndGetInstance({
-	   				pinElement: element
-				});
-				return jagger.getPin();
-	   		}
 			it("should support a string", function() {
-		   		expect( getPinElement.call(this, "<img class='pin' src='url/to/image.jpg'></img>") ).toBeMatchedBy("img.pin");
+		   		expect( this.getPinElement.call(this, "<img class='pin' src='url/to/image.jpg'></img>") ).toBeMatchedBy("img.pin");
 		   	});
 			it("should support a DOM element", function() {
 				var img = document.createElement("img");
 				img.className = "pin";
 
-		   		expect( getPinElement.call(this, img) ).toBeMatchedBy("img.pin");
+		   		expect( this.getPinElement.call(this, img) ).toBeMatchedBy("img.pin");
 		   	});
 			it("should support a jQuery instance", function() {
 				var $img = $("<img>", { "class": "pin" });
-		   		expect( getPinElement.call(this, $img) ).toBeMatchedBy("img.pin");
+		   		expect( this.getPinElement.call(this, $img) ).toBeMatchedBy("img.pin");
 		   	});
 			it("should support a function that will get called on every click", function() {
 				var counter = 0;
@@ -142,6 +136,10 @@ describe("jquery tagger", function() {
 		   		expect( $("#counter2") ).toHaveHtml(2);
 
 		   		expect( pinGenerator ).toHaveBeenCalledWith( jagger );
+		   	});
+		   	it("should have a reference of the template", function() {
+		   		this.$el.trigger("click");
+		   	 	expect( $(".pin").data("template") ).toEqual( this.getTemplateContainer() ); 
 		   	});
 	   	});
    	});

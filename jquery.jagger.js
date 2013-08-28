@@ -28,7 +28,6 @@
 
         this._setOnClickHandler();
 
-
         return this;
     };
 
@@ -57,6 +56,9 @@
                 var $pin      = self.getPin();
                 var $template = self.getTemplate();
 
+                // Add a reference
+                $pin.data("template", $template);
+                
                 // Mouse position onclick
                 var mouseCoords = {
                     x: event.clientX,

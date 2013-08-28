@@ -32,4 +32,12 @@ beforeEach(function() {
 	this.getTemplateContainer = function() {
 		return this.$el.children(".jagger-template-container");
 	};
+
+	this.getPinElement = function(element) {
+		jagger = this.callJaggerAndGetInstance({
+			pinElement: element
+		});
+		return jagger.getPin();
+	};
+
 });
