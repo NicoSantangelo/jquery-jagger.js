@@ -36,12 +36,24 @@
         // Container jquery element
         this.$el = $(element);
 
-        this._setOnClickHandler();
+        this._onClick();
+
+        this._onHover();
 
         return this;
     }
 
     Jagger.prototype = {
+        _onHover: function() {
+            if(this.options.onHoverShow) {
+                var onHoverselector = this.options.onHoverShow;
+                $(".jagger-pin-template-container").on("mouseenter.jagger", function() {
+                    $(this).find(onHoverselector).fadeIn("fast");
+                }).on("mouseleave.jagger", function() {
+                    $(this).find(onHoverselector).stop().fadeOut('fast');
+                });
+            }
+        },
         getContainer: function() {
             var pinTemplateContainer = document.createElement("div");
             pinTemplateContainer.className = prefix("pin-template-container");
@@ -67,7 +79,7 @@
 
             return this._setTemplateHandlers( $(templateContainer) );
         },
-        _setOnClickHandler: function() {
+        _onClick: function() {
             var self = this;
 
             this.$el.on("click.jagger", function(event) {
@@ -84,12 +96,9 @@
                 var pinPosition      = self.determinePinPosition(mouseCoords);
                 var templatePosition = self.determineTemplatePosition(pinPosition);
                 
-                $container.data("jagger:pinCoords", {
-                            top: pinPosition.top,
-                            left: pinPosition.left
-                        })
-                        .append($pin.css(pinPosition), $template.css(templatePosition))
-                        .appendTo(this);
+                $container.append($pin.css(pinPosition), $template.css(templatePosition)).appendTo(this);
+
+                self.$el.trigger("jagger:elementsAdded", [ pinPosition, templatePosition ]);
             });
             return this;
         },
@@ -130,6 +139,9 @@
         },
         remove: function() {
             this.$el.removeData(pluginName);
+            $(prefix.className("template-container")).off("jagger:deleteTemplate");
+            $(prefix.className("pin")).off(".jagger");
+            $(".jagger-pin-template-container").off(".jagger");
             return this.$el;
         }
     };

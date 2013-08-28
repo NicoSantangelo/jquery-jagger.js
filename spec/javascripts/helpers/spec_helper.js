@@ -33,7 +33,11 @@ beforeEach(function() {
 		return this.$el.find(".jagger-template-container");
 	};
 
-	this.getPinElement = function(element) {
+	this.getPin = function() {
+		return this.$el.find("span.jagger-pin");
+	};
+
+	this.resetPinWith = function(element) {
 		jagger = this.callJaggerAndGetInstance({
 			pinElement: element
 		});

@@ -44,15 +44,18 @@ describe("jquery tagger", function() {
 		});
 
 		it("should append the pin using the mouse coords", function() {
-		 	var pinPosition = this.$el.find("span.jagger-pin").position();
+		 	var pinPosition = this.getPin().position();
 
 		 	expect(pinPosition.left).toBe(20);
 		 	expect(pinPosition.top ).toBe(13);
 		});
 
 		it("should append the template", function() {
-		 	expect(this.$el).toContain(".jagger-template-container"); 
-		 	expect( this.$el.find(".jagger-template-container") ).toContain(".in-custom-template"); 
+		 	expect(this.$el).toContain(".jagger-template-container");
+		});
+
+		it("should append the template contents", function() {
+		 	expect( this.getTemplateContainer() ).toContain(".in-custom-template"); 
 		});
 		it("should append the template using the mouse coords", function() {
 			var templatePosition = this.getTemplateContainer().position();
@@ -61,11 +64,12 @@ describe("jquery tagger", function() {
 		 	expect(templatePosition.left).toBe(50);
 		 	expect(templatePosition.top ).toBe(3);
 		});
-		it("should store the pin coords on the containers data", function() {
-			var pinCoords = $(".jagger-pin-template-container").data("jagger:pinCoords");
+		it("should trigger the jagger:elementsAdded trigger", function() {
+			spyOnEvent(this.$el.selector, "jagger:elementsAdded");
 
-			expect(pinCoords.left).toBe(20);
-			expect(pinCoords.top ).toBe(13);
+			this.$el.trigger("click");
+
+			expect("jagger:elementsAdded").toHaveBeenTriggeredOnAndWith(this.$el.selector, jasmine.any(Object), jasmine.any(Object));
 		});
 	});
 
@@ -86,7 +90,7 @@ describe("jquery tagger", function() {
 		it("should delete the template and the pin on jagger:deleteTemplate", function() {
 			$template.trigger("jagger:deleteTemplate"); 
 			
-			expect( $(".jagger-pin-template-container") ).not.toExist();
+			expect( $template.parent() ).not.toExist();
 		});
 	});
 
@@ -101,26 +105,32 @@ describe("jquery tagger", function() {
 	   	});
 
 	   	it("should remove the plugin when remove is called", function() {
-	   		this.$el.jagger("remove");
+	   		this.$el.trigger("click").jagger("remove");
+
 	   		expect(this.getInstance()).not.toBeDefined();
+	   		expect(this.getPin()).not.toHandle("click");
+	   		expect(this.getTemplateContainer()).not.toHandle("jagger:deleteTemplate");
 	   	});
 
 	   	describe("the stored pin element", function() {
 			it("should support a string", function() {
-		   		expect( this.getPinElement.call(this, "<img class='pin' src='url/to/image.jpg'></img>") ).toBeMatchedBy("img.pin");
+		   		expect( this.resetPinWith("<img class='pin' src='url/to/image.jpg'></img>") ).toBeMatchedBy("img.pin");
 		   	});
+
 			it("should support a DOM element", function() {
 				var img = document.createElement("img");
 				img.className = "pin";
 
-		   		expect( this.getPinElement.call(this, img) ).toBeMatchedBy("img.pin");
+		   		expect( this.resetPinWith(img) ).toBeMatchedBy("img.pin");
 		   	});
+
 			it("should support a jQuery instance", function() {
 				var $img = $("<img>", { "class": "pin" });
-		   		expect( this.getPinElement.call(this, $img) ).toBeMatchedBy("img.pin");
+		   		expect( this.resetPinWith($img) ).toBeMatchedBy("img.pin");
 		   	});
+
 			it("should support a function that will get called on every click", function() {
-				var counter = 0;
+				var counter = 0, i = 0;
 				var pinGenerator = jasmine.createSpy('pinGenerator');
 
 				pinGenerator.andCallFake(function(instance) {
@@ -131,15 +141,29 @@ describe("jquery tagger", function() {
 				jagger = this.callJaggerAndGetInstance({
 	   				pinElement: pinGenerator
 				});
-
-		   		this.$el.trigger("click");
-		   		expect( $("#counter1") ).toHaveHtml(1);
-
-		   		this.$el.trigger("click");
-		   		expect( $("#counter2") ).toHaveHtml(2);
-
+				while( (i++) < 5) {
+		   			this.$el.trigger("click");
+		   			expect( $("#counter" + i) ).toHaveHtml(i);
+				}
 		   		expect( pinGenerator ).toHaveBeenCalledWith( jagger );
 		   	});
 	   	});
    	});
+
+	describe("the previously added elements", function() {
+		var $container;
+		beforeEach(function() {
+			this.callJaggerWith({
+				onHoverShow: ".pin-layout"
+			});
+			$container = $(".jagger-pin-template-container");
+		});	
+		it("should add a mouseenter and mouseleave event", function() {
+			expect($container).toHandle("mouseover");
+		});
+		it("should not add a mouseenter and mouseleave event if the hover template is undefined", function() {
+			this.callJaggerWith({ });
+			expect($container).not.toHandle("mouseover");
+		});
+	});
 });
