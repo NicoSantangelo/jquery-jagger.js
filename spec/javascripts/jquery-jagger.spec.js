@@ -64,26 +64,24 @@ describe("jquery tagger", function() {
 	});
 
 	describe("on a custom jagger:event", function() {
-		var $template;
+		var $template, $pin;
 		beforeEach(function() {
 			this.$el.trigger("click");
+
 			$template = this.getTemplateContainer();
+			$pin = $(".pin");
 		});
-		it("should hide the template on jagger:closeTemplate", function() {
-			spyOn(jQuery.fn, "hide");
+		it("should show the template when the pin is clicked", function() {
+			$template.hide();
+			$pin.trigger("click.jagger"); 
 
-			$template.trigger("jagger:closeTemplate"); 
-			expect(jQuery.fn.hide).toHaveBeenCalled();
+			expect($template).toHaveCss({ display: "block" });
 		});
-		it("should show the template on jagger:showTemplate", function() {
-			spyOn(jQuery.fn, "show");
-
-			$template.trigger("jagger:showTemplate"); 
-			expect(jQuery.fn.show).toHaveBeenCalled();
-		});
-		it("should delete the template on jagger:deleteTemplate", function() {
+		it("should delete the template and the pin on jagger:deleteTemplate", function() {
 			$template.trigger("jagger:deleteTemplate"); 
+
 			expect($template.get(0).parentNode).toBeFalsy();
+			expect($pin.get(0).parentNode).toBeFalsy();
 		});
 	});
 
@@ -136,10 +134,6 @@ describe("jquery tagger", function() {
 		   		expect( $("#counter2") ).toHaveHtml(2);
 
 		   		expect( pinGenerator ).toHaveBeenCalledWith( jagger );
-		   	});
-		   	it("should have a reference of the template", function() {
-		   		this.$el.trigger("click");
-		   	 	expect( $(".pin").data("template") ).toEqual( this.getTemplateContainer() ); 
 		   	});
 	   	});
    	});

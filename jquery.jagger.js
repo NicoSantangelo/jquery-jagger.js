@@ -40,7 +40,9 @@
             }
             pin = pin || defaults.pinElement;
 
-            return (typeof pin !== "string" && "jquery" in pin) ? pin : $(pin);
+            var $pin = (typeof pin !== "string" && "jquery" in pin) ? pin : $(pin);
+
+            return this._setPinHandlers( $pin );
         },
         getTemplate: function() {
             var templateContainer = document.createElement("div");
@@ -58,7 +60,8 @@
 
                 // Add a reference
                 $pin.data("template", $template);
-                
+                $template.data("pin", $pin);
+
                 // Mouse position onclick
                 var mouseCoords = {
                     x: event.clientX,
@@ -95,13 +98,16 @@
                 y: elOffset.top  - $window.scrollTop()
             };
         },
+        _setPinHandlers: function($pin) {
+            return $pin.on("click.jagger", function() {
+                $pin.data("template").show();
+                return false;
+            });
+        },
         _setTemplateHandlers: function($template) {
-            return $template.on("jagger:showTemplate", function() {
-                $(this).show();
-            }).on("jagger:closeTemplate", function() {
-                $(this).hide();
-            }).on("jagger:deleteTemplate", function() {
-                $(this).remove();
+            return $template.on("jagger:deleteTemplate", function() {
+                $template.data("pin").remove();
+                $template.remove();
             });
         },
         remove: function() {
