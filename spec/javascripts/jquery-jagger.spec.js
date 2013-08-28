@@ -44,7 +44,7 @@ describe("jquery tagger", function() {
 		});
 
 		it("should append the pin using the mouse coords", function() {
-		 	var pinPosition = this.$el.children("span.pin").position();
+		 	var pinPosition = this.$el.find("span.pin").position();
 
 		 	expect(pinPosition.left).toBe(20);
 		 	expect(pinPosition.top ).toBe(13);
@@ -79,9 +79,8 @@ describe("jquery tagger", function() {
 		});
 		it("should delete the template and the pin on jagger:deleteTemplate", function() {
 			$template.trigger("jagger:deleteTemplate"); 
-
-			expect($template.get(0).parentNode).toBeFalsy();
-			expect($pin.get(0).parentNode).toBeFalsy();
+			
+			expect( $(".jagger-template-container") ).not.toExist();
 		});
 	});
 

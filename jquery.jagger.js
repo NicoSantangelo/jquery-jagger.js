@@ -32,6 +32,12 @@
     };
 
     Jagger.prototype = {
+        getContainer: function() {
+            var pinTemplateContainer = document.createElement("div");
+            pinTemplateContainer.className = "jagger-pin-template-container";
+
+            return $(pinTemplateContainer);
+        },
         getPin: function() {
             var pin = this.options.pinElement;
 
@@ -55,12 +61,12 @@
             var self = this;
 
             this.$el.on("click.jagger", function(event) {
-                var $pin      = self.getPin();
-                var $template = self.getTemplate();
+                var $container = self.getContainer();
+                var $template  = self.getTemplate();
+                var $pin       = self.getPin();
 
                 // Add a reference
                 $pin.data("template", $template);
-                $template.data("pin", $pin);
 
                 // Mouse position onclick
                 var mouseCoords = {
@@ -68,11 +74,10 @@
                     y: event.clientY
                 };
 
-                var pinPosition = self.determinePinPosition(mouseCoords);
-
-                $pin.css(pinPosition).appendTo(this);
-
-                $template.css( self.determineTemplatePosition(pinPosition) ).appendTo(this)
+                var pinPosition      = self.determinePinPosition(mouseCoords);
+                var templatePosition = self.determineTemplatePosition(pinPosition);
+                
+                $container.append($pin.css(pinPosition), $template.css(templatePosition)).appendTo(this);
             });
             return this;
         },
@@ -86,9 +91,11 @@
         },
         determineTemplatePosition: function(pinPosition) {
             //Fixed for now
-            pinPosition.top  -= 10;
-            pinPosition.left += 30;
-            return pinPosition;
+            return {
+                position: "absolute",
+                top:  pinPosition.top - 10,
+                left: pinPosition.left + 30
+            };
         },
         getElOffset: function() {
             var $window  = $(window);
@@ -106,8 +113,7 @@
         },
         _setTemplateHandlers: function($template) {
             return $template.on("jagger:deleteTemplate", function() {
-                $template.data("pin").remove();
-                $template.remove();
+                $template.parent().remove();
             });
         },
         remove: function() {

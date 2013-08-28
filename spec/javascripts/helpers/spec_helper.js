@@ -30,7 +30,7 @@ beforeEach(function() {
 	};
 
 	this.getTemplateContainer = function() {
-		return this.$el.children(".jagger-template-container");
+		return this.$el.find(".jagger-template-container");
 	};
 
 	this.getPinElement = function(element) {
