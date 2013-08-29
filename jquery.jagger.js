@@ -10,9 +10,10 @@
         prefix      = pluginName + "-",
         classPrefix = "." + prefix;
 
-    var classes = {
+    var selectors = {
         pin:               classPrefix + "pin",
         container:         classPrefix + "pin-template-container",
+        onHover:           classPrefix + "pin-on-hover",
         templateContainer: classPrefix + "template-container"
     };
 
@@ -22,10 +23,11 @@
 
     // jagger defaults
     var defaults = {
-        classes: classes,
+        selectors: selectors,
         template: "#" + prefix + "template",
+        showPreviousElementsOnHover: false,
         pinElement: function() {
-            return "<span class='" + removeDot(classes.pin) + "'></span>";
+            return "<span class='" + removeDot(selectors.pin) + "'></span>";
         }
     };
 
@@ -39,7 +41,7 @@
         this.options = $.extend({}, defaults, options);
 
         // Handy shortcut
-        classes = $.extend({}, defaults.classes, this.options.classes);
+        selectors = $.extend({}, defaults.selectors, this.options.selectors);
 
         // Container jquery element
         this.$el = $(element);
@@ -53,20 +55,21 @@
 
     Jagger.prototype = {
         _onHover: function() {
-            if(this.options.onHoverShow) {
-                var onHoverselector = this.options.onHoverShow;
+            if(this.options.showPreviousElementsOnHover) {
 
-                $(classes.container).on("mouseenter.jagger", function() {
-                    $(this).find(onHoverselector).fadeIn("fast");
+                $(selectors.container).on("mouseenter.jagger", function() {
+                    $(this).find(selectors.onHover).fadeIn("fast");
                 }).on("mouseleave.jagger", function() {
-                    $(this).find(onHoverselector).stop().fadeOut('fast');
+                    $(this).find(selectors.onHover).stop().fadeOut('fast', function() {
+                        console.log("GASD")
+                    });
                 });
 
             }
         },
         getContainer: function() {
             var pinTemplateContainer = document.createElement("div");
-            pinTemplateContainer.className = removeDot(classes.container);
+            pinTemplateContainer.className = removeDot(selectors.container);
 
             return $(pinTemplateContainer);
         },
@@ -85,7 +88,7 @@
         getTemplate: function() {
             var templateContainer = document.createElement("div");
 
-            templateContainer.className = removeDot(classes.templateContainer);
+            templateContainer.className = removeDot(selectors.templateContainer);
             templateContainer.innerHTML = $(this.options.template).html();
 
             return this._setTemplateHandlers( $(templateContainer) );
@@ -139,7 +142,7 @@
         },
         _setPinHandlers: function($pin) {
             return $pin.on("click.jagger", function() {
-                $pin.siblings(classes.templateContainer).show();
+                $pin.siblings(selectors.templateContainer).show();
                 return false;
             });
         },
@@ -151,8 +154,8 @@
         remove: function() {
             this.$el.removeData(pluginName);
 
-            $(classes.templateContainer).off("jagger:deleteTemplate");
-            $(classes.pin + ", " + classes.container).off(".jagger");
+            $(selectors.templateContainer).off("jagger:deleteTemplate");
+            $(selectors.pin + ", " + selectors.container).off(".jagger");
 
             return this.$el;
         }

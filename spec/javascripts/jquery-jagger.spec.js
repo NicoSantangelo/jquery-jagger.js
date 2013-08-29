@@ -5,6 +5,9 @@ describe("jquery tagger", function() {
 		this.initializeTestSuite();
 
 		jagger = this.callJaggerAndGetInstance({
+			selectors: {
+				pin: ".my-custom-pin-class"
+			},
    			template: "#my-template"
    		});
 	});
@@ -40,7 +43,7 @@ describe("jquery tagger", function() {
 		});
 
 		it("should append a pin element to the container", function() {
-		 	expect(this.$el).toContain("span.jagger-pin");
+		 	expect(this.$el).toContain("span.my-custom-pin-class");
 		});
 
 		it("should append the pin using the mouse coords", function() {
@@ -71,12 +74,12 @@ describe("jquery tagger", function() {
 
 			expect("jagger:elementsAdded").toHaveBeenTriggeredOnAndWith(this.$el.selector, jasmine.any(Object), jasmine.any(Object));
 		});
-		it("should allow class customization", function() {
+		it("should allow selector customization", function() {
 			this.callJaggerWith({
-				classes: {
-					pin: 			   "my-custom-pin-class",
-					container:         "my-custom-container",
-					templateContainer: "my-custom-template-container"
+				selectors: {
+					pin: 			   ".my-custom-pin-class",
+					container:         ".my-custom-container",
+					templateContainer: ".my-custom-template-container"
 				}
 			});
 			this.$el.trigger("click");
@@ -93,7 +96,7 @@ describe("jquery tagger", function() {
 			this.$el.trigger("click");
 
 			$template = this.getTemplateContainer();
-			$pin = $(".jagger-pin");
+			$pin = $(".my-custom-pin-class");
 		});
 		it("should show the template when the pin is clicked", function() {
 			$template.hide();
@@ -168,16 +171,35 @@ describe("jquery tagger", function() {
 		var $container;
 		beforeEach(function() {
 			this.callJaggerWith({
-				onHoverShow: ".pin-layout"
+				selectors: {
+					onHover: ".pin-layout"
+				},
+				showPreviousElementsOnHover: true
 			});
 			$container = $(".jagger-pin-template-container");
 		});	
-		it("should add a mouseenter and mouseleave event", function() {
+		it("should have a mouseenter and mouseleave event", function() {
 			expect($container).toHandle("mouseover");
 		});
-		it("should not add a mouseenter and mouseleave event if the hover template is undefined", function() {
+		it("should not have a mouseenter and mouseleave event if showPreviousElementsOnHover is falsy", function() {
 			this.callJaggerWith({ })
 			expect($container).not.toHandle("mouseover");
+		});
+		it("should show the onHover element on mouseenter", function() {
+			var wasHidden = $(".pin-layout").is(":hidden");
+
+			spyOn(jQuery.fn, "fadeIn");
+
+			$container.trigger("mouseover");
+
+			expect(wasHidden).toBeTruthy();
+			expect(jQuery.fn.fadeIn).toHaveBeenCalled();
+		});
+		it("should hide the onHover element on mouseleave", function() {
+			spyOn(jQuery.fn, "fadeOut");
+			$container.trigger("mouseover").trigger("mouseleave");
+
+			expect(jQuery.fn.fadeOut).toHaveBeenCalled();
 		});
 	});
 });

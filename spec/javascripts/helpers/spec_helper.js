@@ -34,7 +34,7 @@ beforeEach(function() {
 	};
 
 	this.getPin = function() {
-		return this.$el.find("span.jagger-pin");
+		return this.$el.find("span.my-custom-pin-class");
 	};
 
 	this.resetPinWith = function(element) {
