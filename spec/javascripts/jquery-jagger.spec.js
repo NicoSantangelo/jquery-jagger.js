@@ -17,7 +17,7 @@ describe("jquery tagger", function() {
     });
 
    	it("should set the instance in the data attribute", function() {
-   		expect( this.$el.data("jagger") instanceof Jagger ).toBeTruthy();
+   		expect( this.$el.data("jagger") ).toBeDefined();
 	});
 
 	it("should delegate the methods to the instance when a string is provided", function() {
@@ -124,6 +124,7 @@ describe("jquery tagger", function() {
 	   	it("should remove the plugin when remove is called", function() {
 	   		this.$el.trigger("click").jagger("remove");
 
+	   		expect(this.$el).not.toHandle("click");
 	   		expect(this.getInstance()).not.toBeDefined();
 	   		expect(this.getPin()).not.toHandle("click");
 	   		expect(this.getTemplateContainer()).not.toHandle("jagger:deleteTemplate");
@@ -178,9 +179,21 @@ describe("jquery tagger", function() {
 			});
 			$container = $(".jagger-pin-template-container");
 		});	
+		it("should not add the click event", function() {
+			expect(this.$el).not.toHandle("click.jagger"); 
+		});
 		it("should have a mouseenter and mouseleave event", function() {
 			expect($container).toHandle("mouseover");
 		});
+		it("should handle both if forceBoth is truthy", function() {
+			this.callJaggerWith({
+				forceBoth: true
+			});
+
+			expect(this.$el).toHandle("click.jagger"); 
+			expect($container).toHandle("mouseover");
+		});
+
 		it("should not have a mouseenter and mouseleave event if showPreviousElementsOnHover is falsy", function() {
 			this.callJaggerWith({ })
 			expect($container).not.toHandle("mouseover");

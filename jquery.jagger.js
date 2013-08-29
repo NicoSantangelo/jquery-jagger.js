@@ -46,26 +46,52 @@
         // Container jquery element
         this.$el = $(element);
 
-        this._onClick();
-
-        this._onHover();
+        this.addHandlers();
 
         return this;
     }
 
     Jagger.prototype = {
-        _onHover: function() {
-            if(this.options.showPreviousElementsOnHover) {
-
-                $(selectors.container).on("mouseenter.jagger", function() {
-                    $(this).find(selectors.onHover).fadeIn("fast");
-                }).on("mouseleave.jagger", function() {
-                    $(this).find(selectors.onHover).stop().fadeOut('fast', function() {
-                        console.log("GASD")
-                    });
-                });
-
+        addHandlers: function() {
+            if(this.options.forceBoth) {
+                this._onHover();
+                this._onClick();
+            } else if(this.options.showPreviousElementsOnHover) {
+                this._onHover();
+            } else {
+                this._onClick();
             }
+            return this;
+        },
+        _onHover: function() {
+            $(selectors.container).on("mouseenter.jagger", function() {
+                $(this).find(selectors.onHover).fadeIn("fast");
+            }).on("mouseleave.jagger", function() {
+                $(this).find(selectors.onHover).stop().fadeOut('fast');
+            });
+        },
+        _onClick: function() {
+            var self = this;
+
+            this.$el.on("click.jagger", function(event) {
+                var $container = self.getContainer();
+                var $template  = self.getTemplate();
+                var $pin       = self.getPin();
+
+                // Mouse position onclick
+                var mouseCoords = {
+                    x: event.clientX,
+                    y: event.clientY
+                };
+
+                var pinPosition      = self.determinePinPosition(mouseCoords);
+                var templatePosition = self.determineTemplatePosition(pinPosition);
+                
+                $container.append($pin.css(pinPosition), $template.css(templatePosition)).appendTo(this);
+
+                self.$el.trigger("jagger:elementsAdded", [ pinPosition, templatePosition ]);
+            });
+            return this;
         },
         getContainer: function() {
             var pinTemplateContainer = document.createElement("div");
@@ -92,29 +118,6 @@
             templateContainer.innerHTML = $(this.options.template).html();
 
             return this._setTemplateHandlers( $(templateContainer) );
-        },
-        _onClick: function() {
-            var self = this;
-
-            this.$el.on("click.jagger", function(event) {
-                var $container = self.getContainer();
-                var $template  = self.getTemplate();
-                var $pin       = self.getPin();
-
-                // Mouse position onclick
-                var mouseCoords = {
-                    x: event.clientX,
-                    y: event.clientY
-                };
-
-                var pinPosition      = self.determinePinPosition(mouseCoords);
-                var templatePosition = self.determineTemplatePosition(pinPosition);
-                
-                $container.append($pin.css(pinPosition), $template.css(templatePosition)).appendTo(this);
-
-                self.$el.trigger("jagger:elementsAdded", [ pinPosition, templatePosition ]);
-            });
-            return this;
         },
         determinePinPosition: function(mouseCoords) {
             var elCoords = this.getElOffset();
@@ -152,7 +155,7 @@
             });
         },
         remove: function() {
-            this.$el.removeData(pluginName);
+            this.$el.off(".jagger").removeData(pluginName);
 
             $(selectors.templateContainer).off("jagger:deleteTemplate");
             $(selectors.pin + ", " + selectors.container).off(".jagger");
@@ -192,7 +195,5 @@
             }
         });
     };
-
-    window.Jagger = Jagger;
 
 })( jQuery );
