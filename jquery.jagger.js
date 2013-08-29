@@ -11,6 +11,7 @@
         classPrefix = "." + prefix;
 
     var selectors = {
+        taggeable:         "img", 
         pin:               classPrefix + "pin",
         container:         classPrefix + "pin-template-container",
         onHover:           classPrefix + "pin-on-hover",
@@ -25,6 +26,7 @@
     var defaults = {
         selectors: selectors,
         template: "#" + prefix + "template",
+        leaveTemplatesOpen: false,
         showPreviousElementsOnHover: false,
         pinElement: function() {
             return "<span class='" + removeDot(selectors.pin) + "'></span>";
@@ -73,7 +75,7 @@
         _onClick: function() {
             var self = this;
 
-            this.$el.on("click.jagger", function(event) {
+            this.$el.children(selectors.taggeable).on("click.jagger", function(event) {
                 var $container = self.getContainer();
                 var $template  = self.getTemplate();
                 var $pin       = self.getPin();
@@ -86,8 +88,12 @@
 
                 var pinPosition      = self.determinePinPosition(mouseCoords);
                 var templatePosition = self.determineTemplatePosition(pinPosition);
-                
-                $container.append($pin.css(pinPosition), $template.css(templatePosition)).appendTo(this);
+                 
+                if(!self.options.leaveTemplatesOpen) {
+                    self.$el.find(selectors.templateContainer).hide();
+                }
+
+                $container.append($pin.css(pinPosition), $template.css(templatePosition)).appendTo(self.$el);
 
                 self.$el.trigger("jagger:elementsAdded", [ pinPosition, templatePosition ]);
             });
@@ -155,8 +161,9 @@
             });
         },
         remove: function() {
-            this.$el.off(".jagger").removeData(pluginName);
+            this.$el.removeData(pluginName);
 
+            this.$el.children(selectors.taggeable).off(".jagger");
             $(selectors.templateContainer).off("jagger:deleteTemplate");
             $(selectors.pin + ", " + selectors.container).off(".jagger");
 

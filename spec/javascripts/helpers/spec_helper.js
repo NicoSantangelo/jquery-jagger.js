@@ -10,6 +10,7 @@ beforeEach(function() {
 
 	this.setElement = function(selector) {
 		this.$el = $(selector);
+		this.$img = this.$el.find("img");
 	};
 
 	this.getInstance = function() {
