@@ -6,24 +6,23 @@
         throw "jQuery should be defined to use jagger";
     }
 
-    var pluginName = "jagger";
+    var pluginName = "jagger",
+        prefix      = pluginName + "-",
+        classPrefix = "." + prefix,
+        idPrefix    = "#" + prefix;
 
-    var prefix = function(selector, before) {
-        return (before || "") + pluginName + "-" + selector;
+    var classes = {
+        pin:               classPrefix + "pin",
+        container:         classPrefix + "pin-template-container",
+        templateContainer: classPrefix + "template-container"
     };
-    prefix.id = function(selector) {
-        return prefix(selector, "#");
-    };
-    prefix.className = function(selector) {
-        return prefix(selector, ".");
-    };
-
 
     // jagger defaults
     var defaults = {
-        template: prefix.id("template"),
-        pinElement: "<span class='" + prefix("pin") + "'></span>"
+        template: idPrefix + "template",
+        pinElement: "<span class='" + classes.pin.slice(1) + "'></span>"
     };
+
     
     /* ==============================================
         Jagger Class
@@ -47,16 +46,18 @@
         _onHover: function() {
             if(this.options.onHoverShow) {
                 var onHoverselector = this.options.onHoverShow;
-                $(".jagger-pin-template-container").on("mouseenter.jagger", function() {
+
+                $(classes.container).on("mouseenter.jagger", function() {
                     $(this).find(onHoverselector).fadeIn("fast");
                 }).on("mouseleave.jagger", function() {
                     $(this).find(onHoverselector).stop().fadeOut('fast');
                 });
+                
             }
         },
         getContainer: function() {
             var pinTemplateContainer = document.createElement("div");
-            pinTemplateContainer.className = prefix("pin-template-container");
+            pinTemplateContainer.className = classes.container.slice(1);
 
             return $(pinTemplateContainer);
         },
@@ -74,7 +75,8 @@
         },
         getTemplate: function() {
             var templateContainer = document.createElement("div");
-            templateContainer.className = prefix("template-container");
+
+            templateContainer.className = classes.templateContainer.slice(1);
             templateContainer.innerHTML = $(this.options.template).html();
 
             return this._setTemplateHandlers( $(templateContainer) );
@@ -128,7 +130,7 @@
         },
         _setPinHandlers: function($pin) {
             return $pin.on("click.jagger", function() {
-                $pin.siblings(prefix.className("template-container")).show();
+                $pin.siblings(classes.templateContainer).show();
                 return false;
             });
         },
@@ -139,9 +141,9 @@
         },
         remove: function() {
             this.$el.removeData(pluginName);
-            $(prefix.className("template-container")).off("jagger:deleteTemplate");
-            $(prefix.className("pin")).off(".jagger");
-            $(".jagger-pin-template-container").off(".jagger");
+            $(classes.templateContainer).off("jagger:deleteTemplate");
+            $(classes.pin).off(".jagger");
+            $(classes.container).off(".jagger");
             return this.$el;
         }
     };

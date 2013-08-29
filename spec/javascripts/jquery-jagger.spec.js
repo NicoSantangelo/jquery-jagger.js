@@ -162,7 +162,7 @@ describe("jquery tagger", function() {
 			expect($container).toHandle("mouseover");
 		});
 		it("should not add a mouseenter and mouseleave event if the hover template is undefined", function() {
-			this.callJaggerWith({ });
+			this.callJaggerWith({ })
 			expect($container).not.toHandle("mouseover");
 		});
 	});
