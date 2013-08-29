@@ -71,6 +71,20 @@ describe("jquery tagger", function() {
 
 			expect("jagger:elementsAdded").toHaveBeenTriggeredOnAndWith(this.$el.selector, jasmine.any(Object), jasmine.any(Object));
 		});
+		it("should allow class customization", function() {
+			this.callJaggerWith({
+				classes: {
+					pin: 			   "my-custom-pin-class",
+					container:         "my-custom-container",
+					templateContainer: "my-custom-template-container"
+				}
+			});
+			this.$el.trigger("click");
+
+		 	expect(this.$el).toContain(".my-custom-pin-class");
+		 	expect(this.$el).toContain(".my-custom-container");
+		 	expect(this.$el).toContain(".my-custom-template-container");
+		});
 	});
 
 	describe("on a custom jagger:event", function() {

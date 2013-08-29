@@ -8,8 +8,7 @@
 
     var pluginName = "jagger",
         prefix      = pluginName + "-",
-        classPrefix = "." + prefix,
-        idPrefix    = "#" + prefix;
+        classPrefix = "." + prefix;
 
     var classes = {
         pin:               classPrefix + "pin",
@@ -17,10 +16,17 @@
         templateContainer: classPrefix + "template-container"
     };
 
+    var removeDot = function(text) {
+        return text.replace(/^\./, "");
+    };
+
     // jagger defaults
     var defaults = {
-        template: idPrefix + "template",
-        pinElement: "<span class='" + classes.pin.slice(1) + "'></span>"
+        classes: classes,
+        template: "#" + prefix + "template",
+        pinElement: function() {
+            return "<span class='" + removeDot(classes.pin) + "'></span>";
+        }
     };
 
     
@@ -31,6 +37,9 @@
     function Jagger( element, options ) {
         // Set the default options
         this.options = $.extend({}, defaults, options);
+
+        // Handy shortcut
+        classes = $.extend({}, defaults.classes, this.options.classes);
 
         // Container jquery element
         this.$el = $(element);
@@ -52,12 +61,12 @@
                 }).on("mouseleave.jagger", function() {
                     $(this).find(onHoverselector).stop().fadeOut('fast');
                 });
-                
+
             }
         },
         getContainer: function() {
             var pinTemplateContainer = document.createElement("div");
-            pinTemplateContainer.className = classes.container.slice(1);
+            pinTemplateContainer.className = removeDot(classes.container);
 
             return $(pinTemplateContainer);
         },
@@ -76,7 +85,7 @@
         getTemplate: function() {
             var templateContainer = document.createElement("div");
 
-            templateContainer.className = classes.templateContainer.slice(1);
+            templateContainer.className = removeDot(classes.templateContainer);
             templateContainer.innerHTML = $(this.options.template).html();
 
             return this._setTemplateHandlers( $(templateContainer) );
@@ -141,9 +150,10 @@
         },
         remove: function() {
             this.$el.removeData(pluginName);
+
             $(classes.templateContainer).off("jagger:deleteTemplate");
-            $(classes.pin).off(".jagger");
-            $(classes.container).off(".jagger");
+            $(classes.pin + ", " + classes.container).off(".jagger");
+
             return this.$el;
         }
     };
