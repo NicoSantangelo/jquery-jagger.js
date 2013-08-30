@@ -1,0 +1,66 @@
+.to-tag, .to-see-tags {
+	float: left;
+	margin: 0 60px;
+}
+.taggeable-container {
+	display: inline-block;
+	position: relative;
+}
+#tagged-image {
+	position: relative;
+}
+.pin-container {
+  text-align: center;
+  background: url("../images/background.png") repeat transparent;
+  padding: 15px;
+  -moz-border-radius: 3px;
+  border-radius: 3px;
+  white-space: nowrap;
+  color: #FFF;
+  /*font: normal 14px 'Helvetica Neue', Arial;*/
+  font: normal 14px Arial;
+}
+.form-container {
+	background: #fff;
+	padding: 5px;
+	border-radius: 5px;
+	border: 2px solid #CCC;
+	z-index: 99;
+}
+.form-container .close-template, .form-container .delete-template {
+	text-decoration: none;
+	font-size: 14px;
+	font-weight: bold;
+	font-family: Helvetica;
+}
+.form-container .close-template {
+	color: #000;
+	float: right;
+}
+.form-container .delete-template {
+	margin-top: 15px;
+	display: block;
+	color: #E22222;
+}
+.form-container .input-container {
+	margin: 4px 0;
+}
+.form-container .input-text {
+	width: 80%;
+}
+.pin {
+	top: -24px;
+	left: -9.5px;
+	width: 22px;
+	padding-right: 2px;
+	height: 20px;
+	background-color: #A7A1A1;
+	border-radius: 10px;
+	border: 1px solid #000;
+	color: #FFF;
+	position: absolute;
+	cursor: pointer;
+	color: white;
+	text-align: center;
+	font: bold 12px/20px Arial;
+}

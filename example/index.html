@@ -7,16 +7,100 @@
 	<link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
-	<div class="taggeable-container">
-		<img id="taggeable-image" src="images/landscape.jpg" width="500"> 
-	</div>
 
+	<div class="to-tag">
+		<h2>Tag here</h2>
+		<!-- A container and the image to tag on -->
+		<div class="taggeable-container">
+			<img id="taggeable-image" src="images/image1.jpg" width="500"> 
+		</div>
+	</div>
+	
+	<div class="to-see-tags">
+		<h2>Already tagged</h2>
+		<!-- The container, image and already pinned content (after create) -->
+		<div id="tagged-image">
+			<img id="taggeable-image" src="images/image2.jpg" width="500"> 
+		
+			<!-- Container for the pin and the layout that gets displayed on hover -->
+			<div class="jagger-pin-template-container">
+				<!-- Pin element... -->
+				<span class="pin" style="position: absolute; top: 316px; left: 238px;">1</span>
+		
+				<!-- ...and it is the element that will be shown on hover -->
+				<div class="pin-layout" style="display:none; position: absolute; top: 306px; left: 265px; color: #FFF">
+					<div class="pin-container">
+						<span class="icon" style="left: 69.5px;"></span>
+						<span class="brand bold">Starbucks</span> <span class="cats"> Coffee / Latte</span>
+					</div>
+				</div>
+			</div>
+			
+		</div>
+	</div>
+	
+	<!-- This will be used to add a template next to the pin -->
 	<script id="jagger-template" type="text/template">
-		<div class="in-default-template">
+		<div class="form-container">
+			<form action="">
+				<a href="#" class="close-template">X</a>
+				<div class="input-container">
+					<input class="input-text" type="text" value="Some input">
+				</div>
+				<div class="input-container">
+					<input type="button" value="Some button">
+				</div>
+				<a href="#" class="delete-template">delete this template?</a>
+			</form>
 		</div>
 	</script>
 
 	<script src="../lib/jquery.js"></script>
-	<script src="../jquery-jagger.js"></script>
+	<script src="../jquery.jagger.js"></script>
+
+	<script>
+		(function() {
+			var counter = 1;
+			var $taggeableContainer = $(".taggeable-container");
+
+			// Start jagger, specify witch pin element to use (a function in this case)
+			$taggeableContainer.jagger({
+				pinElement: function(instance) {
+					return '<span class="pin">' + (counter++) + '</span>';
+				}
+			})
+			.on("click",  ".close-template", function(event) {
+				// Hide the template
+				$(this).parents(".jagger-template-container").hide();
+
+				return false;
+			})
+			.on("click",  ".delete-template", function(event) {
+				// Delete the template
+				$(this).parents(".jagger-template-container").trigger("jagger:deleteTemplate");
+
+				// Recalculate
+				$taggeableContainer.find(".pin").each(function(index) {
+					this.innerHTML = index + 1;
+				});
+
+				counter -= 1;
+
+				return false;
+			})
+			.on("jagger:elementsAdded", function(event, pinPosition, templatePosition) {
+				// Store the values on an input
+				// both objects have a top and left property
+			});
+
+			// Add the hover for the already pinned elements
+			$("#tagged-image").jagger({
+				showPreviousElementsOnHover: true,
+				selectors: {
+					onHover: ".pin-layout"
+				}
+			})
+		})();
+	</script>
 </body>
 </html>
