@@ -120,6 +120,15 @@ describe("jquery tagger", function() {
 
 			expect($template).toHaveCss({ display: "block" });
 		});
+		it("should hide the other templates when the pin is clicked", function() {
+			this.$img.trigger("click");
+
+			$pin.trigger("click.jagger"); 
+
+			var $newTemplate = this.$el.find(".jagger-template-container").not($template);
+
+			expect($newTemplate).toHaveCss({ display: "none" });
+		});
 		it("should delete the template and the pin on jagger:deleteTemplate", function() {
 			$template.trigger("jagger:deleteTemplate"); 
 			
@@ -175,10 +184,10 @@ describe("jquery tagger", function() {
 					counter += 1;
 					return '<span id="counter' + counter + '">' + counter + '</span>';
 				});
-
 				jagger = this.callJaggerAndGetInstance({
 	   				pinElement: pinGenerator
 				});
+
 				while( (i++) < 5) {
 		   			this.$img.trigger("click");
 		   			expect( $("#counter" + i) ).toHaveHtml(i);

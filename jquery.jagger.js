@@ -150,7 +150,9 @@
             };
         },
         _setPinHandlers: function($pin) {
+            var $el = this.$el;
             return $pin.on("click.jagger", function() {
+                $el.find(selectors.templateContainer).hide();
                 $pin.siblings(selectors.templateContainer).show();
                 return false;
             });
