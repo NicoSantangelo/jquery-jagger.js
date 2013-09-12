@@ -104,6 +104,21 @@ describe("jquery tagger", function() {
 
 		 	expect(hideSpy.mostRecentCall.object).toHaveClass("jagger-template-container");
 		});
+
+		it("should save a reference in to the template in the pin", function() {
+			var $pin = this.getPin();
+			var $template = this.getTemplateContainer();
+
+			expect($pin.data("template")).toEqual($template);
+		});
+
+		it("should save a reference in to the pin in the template", function() {
+			var $pin = this.getPin();
+			var $template = this.getTemplateContainer();
+
+			expect($template.data("pin")).toEqual($pin);
+		});
+
 	});
 
 	describe("on a custom jagger:event", function() {
@@ -130,9 +145,12 @@ describe("jquery tagger", function() {
 			expect($newTemplate).toHaveCss({ display: "none" });
 		});
 		it("should delete the template and the pin on jagger:deleteTemplate", function() {
+			var $templateParent =  $template.parent();
+			
 			$template.trigger("jagger:deleteTemplate"); 
 			
-			expect( $template.parent() ).not.toExist();
+			expect( $(".my-custom-pin-class, .jagger-template-container") ).not.toExist();
+			expect( $templateParent ).not.toExist();
 		});
 	});
 

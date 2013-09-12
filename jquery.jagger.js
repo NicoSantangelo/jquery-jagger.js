@@ -88,11 +88,17 @@
 
                 var pinPosition      = self.determinePinPosition(mouseCoords);
                 var templatePosition = self.determineTemplatePosition(pinPosition);
-                 
+                     
                 if(!self.options.leaveTemplatesOpen) {
+                    // Close previously opened templates
                     self.$el.find(selectors.templateContainer).hide();
                 }
 
+                // Save a reference for later use
+                $pin.data("template", $template);
+                $template.data("pin", $pin);
+
+                // Append the pin and the template. Then the container itself
                 $container.append($pin.css(pinPosition), $template.css(templatePosition)).appendTo(self.$el);
 
                 self.$el.trigger("jagger:elementsAdded", [ pinPosition, templatePosition ]);
@@ -153,13 +159,15 @@
             var $el = this.$el;
             return $pin.on("click.jagger", function() {
                 $el.find(selectors.templateContainer).hide();
-                $pin.siblings(selectors.templateContainer).show();
+                $pin.data("template").show();
                 return false;
             });
         },
         _setTemplateHandlers: function($template) {
             return $template.on("jagger:deleteTemplate", function() {
-                $template.parent().remove();
+                // Remove the pin
+                $template.data("pin").remove();
+                $template.parents(selectors.container).remove();
             });
         },
         remove: function() {
