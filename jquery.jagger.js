@@ -95,8 +95,8 @@
                      
                 if(!self.options.leaveTemplatesOpen) {
                     // Close previously opened templates
-                    self.$el.find(selectors.templateContainer).hide();
                     $(selectors.templateLocation).find(selectors.templateContainer).hide();
+                    self.$el.find(selectors.templateContainer).hide();
                 }
 
                 // Add the css and save a reference for later use
