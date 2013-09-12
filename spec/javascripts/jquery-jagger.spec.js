@@ -49,8 +49,8 @@ describe("jquery tagger", function() {
 		it("should append the pin using the mouse coords", function() {
 		 	var pinPosition = this.getPin().position();
 
-		 	expect(pinPosition.left).toBe(20);
-		 	expect(pinPosition.top ).toBe(13);
+		 	expect(Math.round(pinPosition.left)).toBe(20);
+		 	expect(Math.round(pinPosition.top)).toBe(13);
 		});
 
 		it("should append the template", function() {
@@ -65,8 +65,8 @@ describe("jquery tagger", function() {
 			var templatePosition = this.getTemplateContainer().position();
 
 			// For now, the offset of the template is fixed in the code
-		 	expect(templatePosition.left).toBe(50);
-		 	expect(templatePosition.top ).toBe(3);
+		 	expect(Math.round(templatePosition.left)).toBe(50);
+		 	expect(Math.round(templatePosition.top )).toBe(3);
 		});
 
 		it("should trigger the jagger:elementsAdded trigger", function() {
