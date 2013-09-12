@@ -45,4 +45,8 @@ beforeEach(function() {
 		return jagger.getPin();
 	};
 
+	this.cleanUp = function() {
+		this.$el.children(".jagger-pin-template-container").remove();
+	};
+
 });

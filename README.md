@@ -1,4 +1,4 @@
-Javascript tAgger
+Javascript tAGGER
 =============
 
 This plugin allows you to tag certain areas of a photo (or any element).
@@ -14,7 +14,8 @@ $(selector).jagger({
             pin:               ".jagger-pin",
             container:         ".jagger-pin-template-container",
             onHover:           ".jagger-pin-on-hover",
-            templateContainer: ".jagger-template-container"
+            templateContainer: ".jagger-template-container",
+            templateLocation:  ""
         },
         template: "#jagger-template",
         leaveTemplatesOpen: false,
@@ -24,3 +25,5 @@ $(selector).jagger({
         }
 });
 ```
+
+DISCLAIMER: This plugin is still in a "I have little free time to finish it" phase, use it at your own risk.

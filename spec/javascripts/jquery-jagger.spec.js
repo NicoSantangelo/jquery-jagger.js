@@ -41,6 +41,9 @@ describe("jquery tagger", function() {
 			};
 		 	this.$img.trigger(event);
 		});
+		afterEach(function() {
+			this.cleanUp();
+		});
 
 		it("should append a pin element to the container", function() {
 		 	expect(this.$el).toContain("span.my-custom-pin-class");
@@ -119,6 +122,24 @@ describe("jquery tagger", function() {
 			expect($template.data("pin")).toEqual($pin);
 		});
 
+		describe("When a templateLocation is specified", function() {
+			beforeEach(function() {
+				this.cleanUp();
+				this.callJaggerWith({
+					selectors: {
+						templateLocation: ".my-custom-template-location"
+					}
+				});
+
+				this.$img.trigger("click");
+			});
+
+			it("uses it to append the template onclick", function() {
+				expect( $(".my-custom-template-location") ).not.toBeEmpty();
+			});
+			
+		});
+
 	});
 
 	describe("on a custom jagger:event", function() {
@@ -129,12 +150,14 @@ describe("jquery tagger", function() {
 			$template = this.getTemplateContainer();
 			$pin = $(".my-custom-pin-class");
 		});
+
 		it("should show the template when the pin is clicked", function() {
 			$template.hide();
 			$pin.trigger("click.jagger"); 
 
 			expect($template).toHaveCss({ display: "block" });
 		});
+
 		it("should hide the other templates when the pin is clicked", function() {
 			this.$img.trigger("click");
 
@@ -144,9 +167,10 @@ describe("jquery tagger", function() {
 
 			expect($newTemplate).toHaveCss({ display: "none" });
 		});
+
 		it("should delete the template and the pin on jagger:deleteTemplate", function() {
 			var $templateParent =  $template.parent();
-			
+
 			$template.trigger("jagger:deleteTemplate"); 
 			
 			expect( $(".my-custom-pin-class, .jagger-template-container") ).not.toExist();
@@ -226,12 +250,15 @@ describe("jquery tagger", function() {
 			});
 			$container = $(".jagger-pin-template-container");
 		});	
+
 		it("should not add the click event", function() {
 			expect(this.$img).not.toHandle("click.jagger"); 
 		});
+
 		it("should have a mouseenter and mouseleave event", function() {
 			expect($container).toHandle("mouseover");
 		});
+
 		it("should handle both if forceBoth is truthy", function() {
 			this.callJaggerWith({
 				forceBoth: true
@@ -245,6 +272,7 @@ describe("jquery tagger", function() {
 			this.callJaggerWith({ })
 			expect($container).not.toHandle("mouseover");
 		});
+
 		it("should show the onHover element on mouseenter", function() {
 			var wasHidden = $(".pin-layout").is(":hidden");
 			var fadeSpy = spyOn(jQuery.fn, "fadeIn");
@@ -254,6 +282,7 @@ describe("jquery tagger", function() {
 			expect(wasHidden).toBeTruthy();
 		 	expect(fadeSpy.mostRecentCall.object).toHaveClass("pin-layout");
 		});
+
 		it("should hide the onHover element on mouseleave", function() {
 			var fadeSpy = spyOn(jQuery.fn, "fadeOut");
 			$container.trigger("mouseover").trigger("mouseleave");

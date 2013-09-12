@@ -15,7 +15,8 @@
         pin:               classPrefix + "pin",
         container:         classPrefix + "pin-template-container",
         onHover:           classPrefix + "pin-on-hover",
-        templateContainer: classPrefix + "template-container"
+        templateContainer: classPrefix + "template-container",
+        templateLocation:  ""
     };
 
     var removeDot = function(text) {
@@ -28,8 +29,8 @@
         template: "#" + prefix + "template",
         leaveTemplatesOpen: false,
         showPreviousElementsOnHover: false,
-        pinElement: function() {
-            return "<span class='" + removeDot(selectors.pin) + "'></span>";
+        pinElement: function(instance) {
+            return "<span class='" + removeDot(instance.selectors.pin) + "'></span>";
         }
     };
 
@@ -43,7 +44,7 @@
         this.options = $.extend({}, defaults, options);
 
         // Handy shortcut
-        selectors = $.extend({}, defaults.selectors, this.options.selectors);
+        this.selectors = $.extend({}, defaults.selectors, this.options.selectors);
 
         // Container jquery element
         this.$el = $(element);
@@ -66,6 +67,8 @@
             return this;
         },
         _onHover: function() {
+            var selectors = this.selectors;
+
             $(selectors.container).on("mouseenter.jagger", function() {
                 $(this).find(selectors.onHover).fadeIn("fast");
             }).on("mouseleave.jagger", function() {
@@ -74,6 +77,7 @@
         },
         _onClick: function() {
             var self = this;
+            var selectors = this.selectors;
 
             this.$el.children(selectors.taggeable).on("click.jagger", function(event) {
                 var $container = self.getContainer();
@@ -92,14 +96,22 @@
                 if(!self.options.leaveTemplatesOpen) {
                     // Close previously opened templates
                     self.$el.find(selectors.templateContainer).hide();
+                    $(selectors.templateLocation).find(selectors.templateContainer).hide();
                 }
 
-                // Save a reference for later use
-                $pin.data("template", $template);
-                $template.data("pin", $pin);
+                // Add the css and save a reference for later use
+                $pin.css(pinPosition).data("template", $template);
+                $template.css(templatePosition).data("pin", $pin);
 
-                // Append the pin and the template. Then the container itself
-                $container.append($pin.css(pinPosition), $template.css(templatePosition)).appendTo(self.$el);
+                // if a template location exists use it to append the template there, otherwise use the container
+                if(selectors.templateLocation) {
+                    $(selectors.templateLocation).append($template);
+                } else {
+                    $container.append($template);
+                }
+
+                // Append the pin and append the conainer to the DOM
+                $container.append($pin).appendTo(self.$el);
 
                 self.$el.trigger("jagger:elementsAdded", [ pinPosition, templatePosition ]);
             });
@@ -107,7 +119,7 @@
         },
         getContainer: function() {
             var pinTemplateContainer = document.createElement("div");
-            pinTemplateContainer.className = removeDot(selectors.container);
+            pinTemplateContainer.className = removeDot(this.selectors.container);
 
             return $(pinTemplateContainer);
         },
@@ -126,7 +138,7 @@
         getTemplate: function() {
             var templateContainer = document.createElement("div");
 
-            templateContainer.className = removeDot(selectors.templateContainer);
+            templateContainer.className = removeDot(this.selectors.templateContainer);
             templateContainer.innerHTML = $(this.options.template).html();
 
             return this._setTemplateHandlers( $(templateContainer) );
@@ -157,25 +169,34 @@
         },
         _setPinHandlers: function($pin) {
             var $el = this.$el;
+            var selectors = this.selectors;
+
             return $pin.on("click.jagger", function() {
                 $el.find(selectors.templateContainer).hide();
+                $(selectors.templateLocation).find(selectors.templateContainer).hide();
+
                 $pin.data("template").show();
                 return false;
             });
         },
         _setTemplateHandlers: function($template) {
+            var selectors = this.selectors;
+
             return $template.on("jagger:deleteTemplate", function() {
                 // Remove the pin
-                $template.data("pin").remove();
-                $template.parents(selectors.container).remove();
+                $template.data("pin").parents(selectors.container).remove();
+
+                if(selectors.templateLocation) {
+                    $template.remove();    
+                }
             });
         },
         remove: function() {
             this.$el.removeData(pluginName);
 
-            this.$el.children(selectors.taggeable).off(".jagger");
-            $(selectors.templateContainer).off("jagger:deleteTemplate");
-            $(selectors.pin + ", " + selectors.container).off(".jagger");
+            this.$el.children(this.selectors.taggeable).off(".jagger");
+            $(this.selectors.templateContainer).off("jagger:deleteTemplate");
+            $(this.selectors.pin + ", " + this.selectors.container).off(".jagger");
 
             return this.$el;
         }
